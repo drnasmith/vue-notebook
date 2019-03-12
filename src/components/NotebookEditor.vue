@@ -1,13 +1,25 @@
 <template>
 
   <div class="notebook-editor">
-      <div v-if="editing">
-          <editor :initial-value="initialData" v-model="notebook_content"></editor>
-          <button v-on:click="onSaveNote">Save</button>
-          <button v-on:click="onDeleteNote">Delete</button>
-      </div>
-      <div v-else>
-          <button v-on:click="onEditNote">Edit</button>
+      <div class="container">
+        <b-field label="Title" horizontal>
+            <b-input :value="notebookTitle" v-model="notebookTitle"></b-input>
+        </b-field>
+
+        <b-field label="Notebook" horizontal>
+            <editor 
+                :initial-value="notebookContent" 
+                v-model="notebookContent"
+                :init="tinymce_config">
+            </editor>
+        </b-field>
+
+        <b-field label="File Options" horizontal>
+            <button v-on:click="onSaveNote">Save</button>
+            <button v-on:click="onDeleteNote">Delete</button>
+            <button v-on:click="onCancel">Cancel</button>
+        </b-field>
+
       </div>
   </div>
 </template>
@@ -22,47 +34,99 @@ import tinymce from 'tinymce';
 import 'tinymce/themes/modern/theme';
 
 // Any plugins you want to use has to be imported
-//import 'tinymce/plugins/paste';
-//import 'tinymce/plugins/link';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/imagetools';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/paste';
+import 'tinymce/plugins/print';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/table';
+import 'tinymce/plugins/template';
+import 'tinymce/plugins/textcolor';
+import 'tinymce/plugins/hr';
+import 'tinymce/plugins/colorpicker';
+import 'tinymce/plugins/insertdatetime';
+import 'tinymce/plugins/fullscreen';
+import 'tinymce/plugins/save';
+import 'tinymce/plugins/fullpage';
 
 
 // Import TinyMCE
 import Editor from '@tinymce/tinymce-vue';
 
 // Initialize the app
+// All Plugins and toolbar options
+//  plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks 
+//            visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak 
+//            nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker 
+//            imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
+//  toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | 
+//            alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | 
+//            removeformat | addcomment',
+
+const config = {
+  height: 500,
+  inline: false,
+  branding: false,
+  theme: 'modern',
+  plugins: 'code colorpicker fullscreen fullpage hr insertdatetime image imagetools link lists paste print save table template textcolor',
+  toolbar: [
+      'undo redo | save | formatselect bold italic | numlist bullist | alignleft aligncenter alignright alignjustify | link image',
+      'bold italic hr forecolor backcolor fullpage',
+  ],
+  templates: [
+    {title: 'Template 1', description: 'A data capture template', content: 'My content'},
+    {title: 'Template 2', description: 'A processing template', url: 'notebook_template.html'}
+  ],
+};
 
 export default {
-  name: 'NotebookEditor',
-  props: {
-    initialData: String,
-    index: Number,
-  },
-  mounted: function() {
-      console.log("Created....Notebook " + this.$props.index)
-      this.editing = true
-  },
-  data: function() {
-      return {
-          notebook_content: this.$props.initialData,
-          editing: false
-      } 
-  },
-  methods: {
-      onSaveNote: function() {
-          let payload = {text: this.notebook_content, index: this.$props.index}
-          this.$store.commit('update', payload)
-          this.editing = false
-      },
-      onDeleteNote: function() {
-          this.$store.commit('delete', this.$props.index)
-          this.editing = false
-      },
-      onEditNote: function() {
-          this.editing = true
-      }
-  },
-  components: {
-      'editor': Editor,
-  },
+    name: 'NotebookEditor',
+    props: {
+        initialNotebook: Object,
+        notebookIndex: Number,
+    },
+    data: function() {
+        return {
+            notebookContent: '',
+            notebookTitle: '',
+            editing: false,
+            tinymce_config: config,
+        }
+    },
+    methods: {
+        onSaveNote: function() {
+            let payload = {text: this.notebookContent, index: this.$props.notebookIndex, title: this.notebookTitle}
+            this.$emit('update-notebook', payload)
+            this.editing = false
+        },
+        onDeleteNote: function() {
+            this.$store.commit('delete', this.$props.notebookIndex)
+            this.editing = false
+        },
+        onCancel: function() {
+            this.editing = false
+            this.$emit('cancel')
+        }
+    },
+    components: {
+        'editor': Editor,
+    },
+    created: function() {
+        console.log("Vue component Created")
+        var self = this
+        this.tinymce_config.save_onsavecallback = function () { 
+            self.onSaveNote()
+            console.log('Saved'); 
+        }
+    },
+    mounted: function() {
+        console.log("Mounted Editor: " + JSON.stringify(this.$props.initialNotebook))
+        this.notebookContent = this.$props.initialNotebook.text
+        this.notebookTitle = this.$props.initialNotebook.title
+
+        this.editing = true
+    }
 }
 </script>
