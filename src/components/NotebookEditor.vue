@@ -31,7 +31,13 @@
 import tinymce from 'tinymce';
 
 // A theme is also required
-import 'tinymce/themes/modern/theme';
+
+import 'tinymce/icons/default';
+import 'tinymce/themes/silver';
+
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/ui/oxide/content.min.css';
+import 'tinymce/skins/content/default/content.css';
 
 // Any plugins you want to use has to be imported
 import 'tinymce/plugins/code';
@@ -43,9 +49,7 @@ import 'tinymce/plugins/print';
 import 'tinymce/plugins/lists';
 import 'tinymce/plugins/table';
 import 'tinymce/plugins/template';
-import 'tinymce/plugins/textcolor';
 import 'tinymce/plugins/hr';
-import 'tinymce/plugins/colorpicker';
 import 'tinymce/plugins/insertdatetime';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/save';
@@ -69,8 +73,8 @@ const config = {
   height: 500,
   inline: false,
   branding: false,
-  theme: 'modern',
-  plugins: 'code colorpicker fullscreen fullpage hr insertdatetime image imagetools link lists paste print save table template textcolor',
+//   theme: 'silver',
+  plugins: 'code fullscreen fullpage hr insertdatetime image imagetools link lists paste print save table template',
   toolbar: [
       'undo redo | save | formatselect bold italic | numlist bullist | alignleft aligncenter alignright alignjustify | link image',
       'bold italic hr forecolor backcolor fullpage',
