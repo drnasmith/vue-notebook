@@ -10,7 +10,7 @@
   "dependencies": {
     "@tinymce/tinymce-vue": "^3.0.1",
     "buefy": "^0.7.3",
-    "tinymce": "^5.4.1",
+    "tinymce": "^5.7.1",
     "vue": "^2.5.17",
     "vuex": "^3.0.1"
   },
